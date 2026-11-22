@@ -864,13 +864,13 @@
         Pick the option matching how your phone is connected right now:
       </p>
 
-      <!-- 5G Cloud Mode -->
-      <div class="mode-switch-card" onclick="selectPreset('https://insider-appreciated-fourth-burner.trycloudflare.com')">
+      <!-- 24/7 Cloud Mode -->
+      <div class="mode-switch-card" onclick="selectPreset('https://tata-aia-form-filler.onrender.com')">
         <div style="font-weight: 700; color: #0284c7; font-size: 13.5px;">
-          <i class="fa-solid fa-tower-broadcast"></i> 5G Mobile Data Mode (Active Cloud Tunnel)
+          <i class="fa-solid fa-cloud"></i> 24/7 Cloud Mode (Render Cloud Server)
         </div>
         <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
-          Use when on 5G/4G cellular data anywhere outside Wi-Fi range.
+          Always online anywhere on 5G/4G/Wi-Fi without running PC.
         </div>
       </div>
 
@@ -907,7 +907,7 @@
         Connect your Samsung S24 FE using either Wi-Fi or 5G Cloud Mode:
       </p>
       <div style="background: #e2e8f0; padding: 10px; border-radius: 6px; font-weight: 700; font-size: 13px; margin: 10px 0; word-break: break-all;" id="mobile-url-text">
-        https://insider-appreciated-fourth-burner.trycloudflare.com
+        https://tata-aia-form-filler.onrender.com
       </div>
       <div style="margin: 14px 0;">
         <a href="/static/TataAIAFormFiller_v2.apk" class="btn btn-primary btn-block" style="text-decoration: none;" download>
@@ -958,15 +958,15 @@
     let sigCanvas = null;
     let sigCtx = null;
 
-    // Smart default: Public cloud tunnel first (works on 5G & Wi-Fi), fallback to local Wi-Fi
-    const CLOUD_TUNNEL_URL = 'https://insider-appreciated-fourth-burner.trycloudflare.com';
+    // Smart default: 24/7 Cloud server hosted on Render
+    const CLOUD_TUNNEL_URL = 'https://tata-aia-form-filler.onrender.com';
     const LOCAL_WIFI_URL = 'http://10.127.47.178:8000';
 
     let serverBaseUrl = CLOUD_TUNNEL_URL;
     if (window.AndroidBridge && typeof window.AndroidBridge.getServerUrl === 'function') {
       try {
         const saved = window.AndroidBridge.getServerUrl();
-        if (saved && !saved.includes('10.127.47.178') && !saved.includes('uniprotkb') && (!saved.includes('trycloudflare.com') || saved === CLOUD_TUNNEL_URL)) {
+        if (saved && !saved.includes('10.127.47.178') && !saved.includes('uniprotkb') && !saved.includes('trycloudflare.com')) {
           serverBaseUrl = saved;
         } else {
           serverBaseUrl = CLOUD_TUNNEL_URL;
@@ -975,7 +975,7 @@
       } catch (e) {}
     } else if (localStorage.getItem('tata_server_url')) {
       const saved = localStorage.getItem('tata_server_url');
-      if (saved && !saved.includes('10.127.47.178') && !saved.includes('uniprotkb') && (!saved.includes('trycloudflare.com') || saved === CLOUD_TUNNEL_URL)) {
+      if (saved && !saved.includes('10.127.47.178') && !saved.includes('uniprotkb') && !saved.includes('trycloudflare.com')) {
         serverBaseUrl = saved;
       } else {
         localStorage.setItem('tata_server_url', CLOUD_TUNNEL_URL);
@@ -1004,10 +1004,10 @@
       const inp = document.getElementById('custom-server-input');
       if (inp) inp.value = serverBaseUrl;
       const lbl = document.getElementById('server-status-label');
-      if (serverBaseUrl.includes('trycloudflare.com')) {
-        if (lbl) lbl.innerText = 'Cloud 5G:';
+      if (serverBaseUrl.includes('onrender.com')) {
+        if (lbl) lbl.innerText = 'Render Cloud:';
       } else {
-        if (lbl) lbl.innerText = 'Wi-Fi:';
+        if (lbl) lbl.innerText = 'Server:';
       }
     }
 
@@ -1253,19 +1253,10 @@
     }
 
     function showConnectionErrorDialog(errMsg) {
-      const is5g = !serverBaseUrl.includes('trycloudflare.com');
-      let msg = 'Could not reach server at:\n' + serverBaseUrl + '\n\n';
-      if (is5g) {
-        msg += 'Notice: Your phone is on 5G Mobile Data! Local Wi-Fi addresses (10.x.x.x) only work when your phone is connected to Wi-Fi.\n\n';
-        msg += 'Would you like to switch to 5G Cloud Mode now?';
-        if (confirm(msg)) {
-          selectPreset(CLOUD_TUNNEL_URL);
-          runDocumentExtraction();
-        }
-      } else {
-        msg += 'Please ensure start_app.bat is running on your computer.';
-        alert(msg);
-      }
+      let msg = 'Could not reach cloud server at:\n' + serverBaseUrl + '\n\n';
+      msg += 'Detail: ' + errMsg + '\n\n';
+      msg += 'Note: If the cloud server was inactive, it may take ~30 seconds to wake up. Please check your phone internet and tap again.';
+      alert(msg);
     }
 
     function populateFormFields(d) {
