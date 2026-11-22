@@ -62,7 +62,7 @@ async def serve_index():
 @app.get("/api/system-info")
 async def get_system_info():
     ip = get_local_ip()
-    port = 8000
+    port = int(os.environ.get("PORT", 8000))
     mobile_url = f"http://{ip}:{port}"
     return {
         "local_ip": ip,
@@ -266,7 +266,7 @@ async def download_pdf(job_id: str):
 if __name__ == "__main__":
     import uvicorn
     local_ip = get_local_ip()
-    port = 8000
+    port = int(os.environ.get("PORT", 8000))
     print("\n" + "="*60)
     print("   TATA AIA AUTO FORM FILLER - SERVER READY")
     print(f"   PC Local Access:    http://localhost:{port}")
