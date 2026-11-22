@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <cache-path name="cache_pdfs" path="tata_aia_forms/" />
+    <external-cache-path name="ext_cache_pdfs" path="tata_aia_forms/" />
+    <external-files-path name="ext_files_pdfs" path="tata_aia_forms/" />
+    <external-path name="ext_downloads" path="Download/" />
+</paths>

@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Tata AIA Life - Auto Form Filler</title>
+  <meta name="theme-color" content="#002663">
+  <meta name="description" content="Automated KYC Extraction and Authentic Handwriting Form Filler for Tata AIA Life Insurance">
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #002663;
+      --primary-dark: #001740;
+      --accent: #b81424;
+      --accent-hover: #9c0e1d;
+      --bg: #f4f6fa;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --blue-ink: #1447a6;
+      --radius: 12px;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Bar */
+    .navbar {
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-badge {
+      background: #fff;
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 13px;
+      padding: 5px 9px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      border-left: 4px solid var(--accent);
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .mobile-sync-btn {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .mobile-sync-btn:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* Server Status Bar */
+    .server-status-bar {
+      background: #e2e8f0;
+      padding: 8px 16px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #334155;
+      border-bottom: 1px solid #cbd5e1;
+      cursor: pointer;
+    }
+    .server-status-bar:hover {
+      background: #cbd5e1;
+    }
+    .server-status-bar .edit-link {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* Tab bar */
+    .tab-bar {
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+
+    .tab-btn {
+      flex: 1;
+      min-width: 105px;
+      padding: 12px 14px;
+      text-align: center;
+      background: none;
+      border: none;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--accent);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px 14px 80px 14px;
+      flex: 1;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+    .tab-pane.active {
+      display: block;
+      animation: fadeIn 0.25s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Upload grid */
+    .upload-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .upload-box {
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      padding: 16px 10px;
+      text-align: center;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .upload-box:hover {
+      border-color: var(--primary);
+      background: #f1f5f9;
+    }
+    .upload-box.has-file {
+      border-color: var(--success);
+      background: #ecfdf5;
+    }
+    .upload-box input[type="file"] {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+    .upload-icon {
+      font-size: 24px;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+    .upload-box.has-file .upload-icon {
+      color: var(--success);
+    }
+    .upload-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .upload-hint {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Action buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--text);
+    }
+    .btn-secondary:hover {
+      background: #cbd5e1;
+    }
+    .btn-success {
+      background: #10b981;
+      color: #fff;
+    }
+    .btn-success:hover {
+      background: #059669;
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--primary);
+    }
+    .btn-block {
+      width: 100%;
+    }
+
+    /* Form Fields Grid */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .form-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .form-control {
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 13.5px;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border 0.2s;
+      text-transform: uppercase;
+    }
+    #custom-server-input {
+      text-transform: none;
+    }
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 38, 99, 0.1);
+    }
+
+    /* Quick Load Samples */
+    .sample-bar {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Preview section */
+    .preview-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .preview-image-wrapper {
+      width: 100%;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      position: relative;
+    }
+    .preview-image-wrapper img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .page-nav {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .page-chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--text-muted);
+    }
+    .page-chip.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal-box {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 22px;
+      max-width: 440px;
+      width: 100%;
+      text-align: left;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .badge-hw {
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 10.5px;
+      font-weight: 600;
+      margin-left: 8px;
+    }
+
+    .mode-switch-card {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .mode-switch-card:hover {
+      border-color: var(--primary);
+      background: #f1f5f9;
+    }
+    .mode-switch-card.active {
+      border-color: var(--primary);
+      background: #eff6ff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="brand-group">
+      <div class="logo-badge">TATA AIA</div>
+      <div>
+        <div class="brand-title">Auto Form Filler</div>
+        <div class="brand-subtitle">Dev by Sagar Pathade • Samsung S24 FE</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="mobile-sync-btn" onclick="openServerConfig()">
+        <i class="fa-solid fa-server"></i> Server
+      </button>
+      <button class="mobile-sync-btn" onclick="openQrModal()">
+        <i class="fa-solid fa-qrcode"></i> Sync
+      </button>
+    </div>
+  </header>
+
+  <!-- Server Status Bar -->
+  <div class="server-status-bar" onclick="openServerConfig()">
+    <span><i class="fa-solid fa-circle" style="color: #10b981; font-size: 9px;" id="server-dot"></i> <span id="server-status-label">Server:</span> <b id="server-display-url">http://10.127.47.178:8000</b></span>
+    <span class="edit-link"><i class="fa-solid fa-gear"></i> Change</span>
+  </div>
+
+  <!-- Step Tab Bar -->
+  <nav class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('upload')">
+      <i class="fa-solid fa-cloud-arrow-up"></i> 1. Upload Docs
+    </button>
+    <button class="tab-btn" onclick="switchTab('details')">
+      <i class="fa-solid fa-pen-to-square"></i> 2. Form Details
+    </button>
+    <button class="tab-btn" onclick="switchTab('preview')">
+      <i class="fa-solid fa-file-pdf"></i> 3. Preview & Share
+    </button>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="container">
+
+    <!-- TAB 1: UPLOAD DOCUMENTS -->
+    <section id="pane-upload" class="tab-pane active">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-camera"></i> Snap or Upload Customer Documents
+          <span class="badge-hw">AI OCR Extraction</span>
+        </div>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 14px;">
+          Take a photo or upload Aadhaar, PAN, Passbook, Loan Sheet, and Nominee ID. AI parses all information instantly.
+        </p>
+
+        <div class="upload-grid">
+          <!-- Aadhaar -->
+          <div class="upload-box" id="box-aadhaar">
+            <input type="file" id="file-aadhaar" accept="image/*,application/pdf" multiple onchange="handleFileSelected(this, 'box-aadhaar', 'lbl-aadhaar')">
+            <div class="upload-icon"><i class="fa-solid fa-id-card"></i></div>
+            <div class="upload-label" id="lbl-aadhaar">Aadhaar Card</div>
+            <div class="upload-hint">Front & Back (Multi)</div>
+          </div>
+
+          <!-- PAN Card -->
+          <div class="upload-box" id="box-pan">
+            <input type="file" id="file-pan" accept="image/*,application/pdf" multiple onchange="handleFileSelected(this, 'box-pan', 'lbl-pan')">
+            <div class="upload-icon"><i class="fa-solid fa-address-card"></i></div>
+            <div class="upload-label" id="lbl-pan">PAN Card</div>
+            <div class="upload-hint">PAN Photo</div>
+          </div>
+
+          <!-- Bank Passbook -->
+          <div class="upload-box" id="box-bank">
+            <input type="file" id="file-bank" accept="image/*,application/pdf" multiple onchange="handleFileSelected(this, 'box-bank', 'lbl-bank')">
+            <div class="upload-icon"><i class="fa-solid fa-building-columns"></i></div>
+            <div class="upload-label" id="lbl-bank">Bank Passbook</div>
+            <div class="upload-hint">A/C & IFSC</div>
+          </div>
+
+          <!-- Loan Sheet -->
+          <div class="upload-box" id="box-loan">
+            <input type="file" id="file-loan" accept="image/*,application/pdf" multiple onchange="handleFileSelected(this, 'box-loan', 'lbl-loan')">
+            <div class="upload-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <div class="upload-label" id="lbl-loan">Loan Sheet</div>
+            <div class="upload-hint">Sum Assured</div>
+          </div>
+
+          <!-- Nominee Aadhaar / PAN -->
+          <div class="upload-box" id="box-nominee">
+            <input type="file" id="file-nominee" accept="image/*,application/pdf" multiple onchange="handleFileSelected(this, 'box-nominee', 'lbl-nominee')">
+            <div class="upload-icon"><i class="fa-solid fa-user-shield"></i></div>
+            <div class="upload-label" id="lbl-nominee">Nominee ID</div>
+            <div class="upload-hint">Front & Back (Multi)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer & Witness Signatures -->
+      <div class="card" style="margin-top: 14px;">
+        <div class="card-title">
+          <i class="fa-solid fa-file-signature"></i> Customer & Witness Signatures
+          <span class="badge-hw">Auto-Stamps on PDF</span>
+        </div>
+        <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 12px;">
+          Upload a signature photo or draw directly on your Samsung screen with finger/stylus:
+        </p>
+
+        <div class="upload-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 0;">
+          <!-- Borrower Signature -->
+          <div class="upload-box" id="box-sig-borrower" style="padding: 12px 6px; min-height: 130px;">
+            <input type="file" id="file-sig-borrower" accept="image/*" capture="environment" onchange="handleSignatureFileSelected(this, 'borrower')">
+            <div class="upload-icon"><i class="fa-solid fa-signature"></i></div>
+            <div class="upload-label" id="lbl-sig-borrower">Borrower Sign</div>
+            <div class="upload-hint" id="hint-sig-borrower">Upload / Snap Photo</div>
+            <div style="margin-top: 6px;">
+              <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 4px 8px;" onclick="event.stopPropagation(); openSignaturePad('borrower')">
+                <i class="fa-solid fa-pen"></i> Draw on Screen
+              </button>
+            </div>
+            <img id="thumb-sig-borrower" style="display: none; max-height: 36px; max-width: 90%; margin: 6px auto 0 auto; border: 1px solid #cbd5e1; border-radius: 4px; background: white; padding: 2px;" alt="Borrower Sign Preview">
+          </div>
+
+          <!-- Witness Signature -->
+          <div class="upload-box" id="box-sig-witness" style="padding: 12px 6px; min-height: 130px;">
+            <input type="file" id="file-sig-witness" accept="image/*" capture="environment" onchange="handleSignatureFileSelected(this, 'witness')">
+            <div class="upload-icon"><i class="fa-solid fa-user-pen"></i></div>
+            <div class="upload-label" id="lbl-sig-witness">Witness Sign</div>
+            <div class="upload-hint" id="hint-sig-witness">Upload / Snap Photo</div>
+            <div style="margin-top: 6px;">
+              <button type="button" class="btn btn-secondary" style="font-size: 11px; padding: 4px 8px;" onclick="event.stopPropagation(); openSignaturePad('witness')">
+                <i class="fa-solid fa-pen"></i> Draw on Screen
+              </button>
+            </div>
+            <img id="thumb-sig-witness" style="display: none; max-height: 36px; max-width: 90%; margin: 6px auto 0 auto; border: 1px solid #cbd5e1; border-radius: 4px; background: white; padding: 2px;" alt="Witness Sign Preview">
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Button: Auto-Extract All Customer Details (Moved Below Signatures) -->
+      <div style="margin: 14px 0;">
+        <button class="btn btn-primary btn-block" id="btn-extract" onclick="runDocumentExtraction()" style="padding: 14px; font-size: 15px; font-weight: 700; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 38, 99, 0.22);">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Extract All Customer Details
+        </button>
+      </div>
+
+      <!-- Developer Credit Card -->
+      <div class="card" style="text-align: center; border: 1.5px solid #0284c7; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); padding: 18px 14px; box-shadow: 0 2px 10px rgba(2, 132, 199, 0.12);">
+        <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #0369a1; font-weight: 700; margin-bottom: 4px;">
+          <i class="fa-solid fa-code"></i> Application Developed By
+        </div>
+        <div style="font-size: 18px; font-weight: 800; color: #0c4a6e; letter-spacing: 0.8px;">
+          SAGAR PATHADE
+        </div>
+        <div style="font-size: 11.5px; color: #0284c7; font-weight: 600; margin-top: 3px;">
+          Tata AIA Life Insurance • Automated Handwritten Form System
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: FORM DETAILS REVIEW -->
+    <section id="pane-details" class="tab-pane">
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-calculator"></i> Loan & Plan Details
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Loan Amount (₹)</label>
+            <input type="text" id="loan_amount" class="form-control" placeholder="e.g. 711221">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Loan Term (Months)</label>
+            <input type="text" id="loan_term" class="form-control" placeholder="60">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Total Premium (₹)</label>
+            <input type="text" id="premium_amount" class="form-control" placeholder="e.g. 11221">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Proposed Sum Assured (₹)</label>
+            <input type="text" id="base_sum_assured" class="form-control" placeholder="e.g. 711221">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-user"></i> Personal & KYC Details (Life to be Assured)
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Title</label>
+            <select id="title" class="form-control">
+              <option value="Mr">Mr.</option>
+              <option value="Mrs">Mrs.</option>
+              <option value="Ms">Ms.</option>
+            </select>
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Customer Full Name (ALL CAPS)</label>
+            <input type="text" id="customer_name" class="form-control" placeholder="FIRST MIDDLE LAST">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date of Birth (DD/MM/YYYY)</label>
+            <input type="text" id="dob" class="form-control" placeholder="DD/MM/YYYY">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gender</label>
+            <select id="gender" class="form-control">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">PAN Number</label>
+            <input type="text" id="pan" class="form-control" placeholder="ABCDE1234F">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Marital Status</label>
+            <select id="marital_status" class="form-control">
+              <option value="Married">Married</option>
+              <option value="Single">Single</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Gross Annual Income (₹) <span style="font-size: 11px; color: #0284c7; font-weight: normal;">(Fixed ₹2,00,000)</span></label>
+            <input type="text" id="annual_income" class="form-control" value="200000" readonly style="background: #f1f5f9; font-weight: 700; color: #0f172a;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Mobile Number</label>
+            <input type="text" id="mobile" class="form-control" placeholder="98XXXXXXXX">
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Address Line 1</label>
+            <input type="text" id="address_line1" class="form-control" placeholder="AT ... POST ...">
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Address Line 2 (District)</label>
+            <input type="text" id="address_line2" class="form-control" placeholder="DIST ...">
+          </div>
+          <div class="form-group">
+            <label class="form-label">City</label>
+            <input type="text" id="city" class="form-control" placeholder="PARBHANI">
+          </div>
+          <div class="form-group">
+            <label class="form-label">State</label>
+            <input type="text" id="state" class="form-control" value="MAHARASHTRA">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pin Code</label>
+            <input type="text" id="pincode" class="form-control" placeholder="431509">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Occupation</label>
+            <select id="occupation" class="form-control">
+              <option value="Agriculture">Agriculture</option>
+              <option value="Self Employed">Self Employed</option>
+              <option value="Salaried">Salaried</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Education</label>
+            <select id="education" class="form-control">
+              <option value="10th pass">10th pass</option>
+              <option value="12th pass">12th pass</option>
+              <option value="Graduate">Graduate</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-building-columns"></i> Bank Account Details
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Bank Account Number</label>
+            <input type="text" id="bank_account_no" class="form-control" placeholder="e.g. 80054420607">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Bank Name & Branch</label>
+            <input type="text" id="bank_name_branch" class="form-control" placeholder="MAHARASHTRA GRAMIN BANK, JINTUR">
+          </div>
+          <div class="form-group">
+            <label class="form-label">IFSC Code</label>
+            <input type="text" id="ifsc_code" class="form-control" placeholder="MAHG0004205">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-users"></i> Nominee Details
+        </div>
+        <div class="form-grid">
+          <div class="form-group full-width">
+            <label class="form-label">Nominee Full Name</label>
+            <input type="text" id="nominee_name" class="form-control" placeholder="e.g. DASRATH PATHILBUVA KHATAL">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nominee Date of Birth</label>
+            <input type="text" id="nominee_dob" class="form-control" placeholder="01/01/1970">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nominee Gender</label>
+            <select id="nominee_gender" class="form-control">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Relationship with Insured</label>
+            <input type="text" id="nominee_relation" class="form-control" placeholder="FATHER / WIFE / MOTHER">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Share (%)</label>
+            <input type="text" id="nominee_share" class="form-control" value="100 %">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <i class="fa-solid fa-clipboard-check"></i> Physical Attributes & Declaration
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Height (cm)</label>
+            <input type="text" id="height" class="form-control" value="173">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Weight (Kg)</label>
+            <input type="text" id="weight" class="form-control" value="72">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Place of Signing</label>
+            <input type="text" id="place" class="form-control" value="parbhani">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Date (DD/MM/YYYY)</label>
+            <input type="text" id="date" class="form-control" value="30/10/2026">
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Witness Name</label>
+            <input type="text" id="witness_name" class="form-control" value="Shubham Bhujbal">
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-block" id="btn-generate" style="padding: 14px;" onclick="generateFilledForm()">
+        <i class="fa-solid fa-feather-pointed"></i> Generate Handwritten Application Form
+      </button>
+    </section>
+
+    <!-- TAB 3: PREVIEW & DOWNLOAD -->
+    <section id="pane-preview" class="tab-pane">
+      <div class="card">
+        <div class="card-title" style="justify-content: space-between;">
+          <span><i class="fa-solid fa-eye"></i> Form Preview</span>
+          <span id="preview-page-info" style="font-size: 12.5px; color: var(--text-muted);">Page 1 of 3</span>
+        </div>
+
+        <div class="preview-container">
+          <div class="preview-image-wrapper">
+            <img id="preview-img" src="" alt="Application Form Preview">
+          </div>
+
+          <div class="page-nav" id="page-chips">
+            <button class="page-chip active" onclick="showPreviewPage(0)">Page 1</button>
+            <button class="page-chip" onclick="showPreviewPage(1)">Page 2</button>
+            <button class="page-chip" onclick="showPreviewPage(2)">Page 3</button>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap;">
+          <button class="btn btn-success" style="flex: 1; min-width: 150px;" onclick="triggerSharePdf()">
+            <i class="fa-brands fa-whatsapp"></i> Share on WhatsApp
+          </button>
+          <button class="btn btn-primary" style="flex: 1; min-width: 140px;" onclick="triggerDownloadPdf()">
+            <i class="fa-solid fa-download"></i> Download PDF
+          </button>
+          <button class="btn btn-secondary" style="flex: 1; min-width: 120px;" onclick="triggerOpenPdf()">
+            <i class="fa-solid fa-file-lines"></i> Open PDF
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Server Connection Modal -->
+  <div class="modal-backdrop" id="server-modal" onclick="closeServerConfig(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="color: var(--primary); margin-bottom: 6px;">
+        <i class="fa-solid fa-network-wired"></i> Choose Connection Mode
+      </h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">
+        Pick the option matching how your phone is connected right now:
+      </p>
+
+      <!-- 5G Cloud Mode -->
+      <div class="mode-switch-card" onclick="selectPreset('https://insider-appreciated-fourth-burner.trycloudflare.com')">
+        <div style="font-weight: 700; color: #0284c7; font-size: 13.5px;">
+          <i class="fa-solid fa-tower-broadcast"></i> 5G Mobile Data Mode (Active Cloud Tunnel)
+        </div>
+        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
+          Use when on 5G/4G cellular data anywhere outside Wi-Fi range.
+        </div>
+      </div>
+
+      <!-- Wi-Fi Mode -->
+      <div class="mode-switch-card" onclick="selectPreset('http://10.127.47.178:8000')">
+        <div style="font-weight: 700; color: #16a34a; font-size: 13.5px;">
+          <i class="fa-solid fa-wifi"></i> Local Wi-Fi Mode (10.127.47.178:8000)
+        </div>
+        <div style="font-size: 11px; color: #64748b; margin-top: 2px;">
+          Use when phone and PC are on the same Wi-Fi router / Mobile Hotspot.
+        </div>
+      </div>
+
+      <!-- Custom URL -->
+      <div style="margin-top: 10px;">
+        <label style="font-size: 11px; font-weight: 600; color: var(--text-muted);">Custom Server Address:</label>
+        <input type="text" id="custom-server-input" class="form-control" style="margin-top: 4px;" placeholder="http://... or https://...">
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-top: 14px;">
+        <button class="btn btn-primary" style="flex: 1;" onclick="applyCustomServer()">Save & Test</button>
+        <button class="btn btn-secondary" onclick="closeServerConfig()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Sync / Android QR Modal -->
+  <div class="modal-backdrop" id="qr-modal" onclick="closeQrModal(event)">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <h3 style="color: var(--primary); margin-bottom: 8px;">
+        <i class="fa-brands fa-android"></i> Android Phone Connection
+      </h3>
+      <p style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 12px;">
+        Connect your Samsung S24 FE using either Wi-Fi or 5G Cloud Mode:
+      </p>
+      <div style="background: #e2e8f0; padding: 10px; border-radius: 6px; font-weight: 700; font-size: 13px; margin: 10px 0; word-break: break-all;" id="mobile-url-text">
+        https://insider-appreciated-fourth-burner.trycloudflare.com
+      </div>
+      <div style="margin: 14px 0;">
+        <a href="/static/TataAIAFormFiller_v2.apk" class="btn btn-primary btn-block" style="text-decoration: none;" download>
+          <i class="fa-brands fa-android"></i> Download Updated Android APK (v2)
+        </a>
+      </div>
+      <button class="btn btn-secondary btn-block" onclick="closeQrModal()">Close</button>
+    </div>
+  </div>
+
+  <!-- Signature Drawing Pad Modal -->
+  <div class="modal-backdrop" id="sig-pad-modal" onclick="closeSignaturePad(event)">
+    <div class="modal-box" onclick="event.stopPropagation()" style="max-width: 440px;">
+      <h3 style="color: var(--primary); margin-bottom: 6px;" id="sig-pad-title">
+        <i class="fa-solid fa-signature"></i> Sign on Screen
+      </h3>
+      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">
+        Use your finger or stylus to sign below:
+      </p>
+
+      <div style="border: 2px dashed #0284c7; border-radius: 8px; background: #ffffff; touch-action: none; overflow: hidden; margin-bottom: 12px; position: relative;">
+        <canvas id="sig-canvas" width="380" height="160" style="display: block; width: 100%; height: 160px;"></canvas>
+      </div>
+
+      <div style="display: flex; gap: 8px;">
+        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="clearSignatureCanvas()">
+          <i class="fa-solid fa-eraser"></i> Clear
+        </button>
+        <button type="button" class="btn btn-primary" style="flex: 2;" onclick="saveSignatureCanvas()">
+          <i class="fa-solid fa-check"></i> Save Signature
+        </button>
+        <button type="button" class="btn btn-secondary" onclick="closeSignaturePad()">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentPreviewPages = [];
+    let activePageIndex = 0;
+    let currentJobId = null;
+    let currentDownloadUrl = '';
+    let borrowerSignatureDataUrl = '';
+    let witnessSignatureDataUrl = '';
+    let currentDrawingSigType = 'borrower';
+    let isDrawing = false;
+    let sigCanvas = null;
+    let sigCtx = null;
+
+    // Smart default: Public cloud tunnel first (works on 5G & Wi-Fi), fallback to local Wi-Fi
+    const CLOUD_TUNNEL_URL = 'https://insider-appreciated-fourth-burner.trycloudflare.com';
+    const LOCAL_WIFI_URL = 'http://10.127.47.178:8000';
+
+    let serverBaseUrl = CLOUD_TUNNEL_URL;
+    if (window.AndroidBridge && typeof window.AndroidBridge.getServerUrl === 'function') {
+      try {
+        const saved = window.AndroidBridge.getServerUrl();
+        if (saved && !saved.includes('10.127.47.178') && !saved.includes('uniprotkb') && (!saved.includes('trycloudflare.com') || saved === CLOUD_TUNNEL_URL)) {
+          serverBaseUrl = saved;
+        } else {
+          serverBaseUrl = CLOUD_TUNNEL_URL;
+          try { window.AndroidBridge.setServerUrl(CLOUD_TUNNEL_URL); } catch(e){}
+        }
+      } catch (e) {}
+    } else if (localStorage.getItem('tata_server_url')) {
+      const saved = localStorage.getItem('tata_server_url');
+      if (saved && !saved.includes('10.127.47.178') && !saved.includes('uniprotkb') && (!saved.includes('trycloudflare.com') || saved === CLOUD_TUNNEL_URL)) {
+        serverBaseUrl = saved;
+      } else {
+        localStorage.setItem('tata_server_url', CLOUD_TUNNEL_URL);
+        serverBaseUrl = CLOUD_TUNNEL_URL;
+      }
+    } else if (window.location.protocol.startsWith('http')) {
+      serverBaseUrl = window.location.origin;
+    }
+
+    // Auto-capitalize all user inputs across the application
+    document.addEventListener('input', function(e) {
+      if (e.target && e.target.tagName === 'INPUT' && (e.target.type === 'text' || !e.target.type)) {
+        if (e.target.id === 'custom-server-input') return;
+        const start = e.target.selectionStart;
+        const end = e.target.selectionEnd;
+        e.target.value = e.target.value.toUpperCase();
+        if (start !== null && end !== null) {
+          try { e.target.setSelectionRange(start, end); } catch(_) {}
+        }
+      }
+    });
+
+    function updateServerDisplay() {
+      const el = document.getElementById('server-display-url');
+      if (el) el.innerText = serverBaseUrl;
+      const inp = document.getElementById('custom-server-input');
+      if (inp) inp.value = serverBaseUrl;
+      const lbl = document.getElementById('server-status-label');
+      if (serverBaseUrl.includes('trycloudflare.com')) {
+        if (lbl) lbl.innerText = 'Cloud 5G:';
+      } else {
+        if (lbl) lbl.innerText = 'Wi-Fi:';
+      }
+    }
+
+    function openServerConfig() {
+      updateServerDisplay();
+      document.getElementById('server-modal').classList.add('open');
+    }
+    function closeServerConfig(e) {
+      document.getElementById('server-modal').classList.remove('open');
+    }
+
+    function selectPreset(url) {
+      updateServerUrl(url);
+      closeServerConfig();
+    }
+
+    function applyCustomServer() {
+      const val = document.getElementById('custom-server-input').value.trim();
+      if (val) {
+        updateServerUrl(val);
+        closeServerConfig();
+      }
+    }
+
+    function updateServerUrl(newUrl) {
+      if (!newUrl.startsWith('http://') && !newUrl.startsWith('https://')) {
+        newUrl = 'http://' + newUrl;
+      }
+      serverBaseUrl = newUrl.replace(/\/+$/, '');
+      localStorage.setItem('tata_server_url', serverBaseUrl);
+      if (window.AndroidBridge && typeof window.AndroidBridge.setServerUrl === 'function') {
+        try { window.AndroidBridge.setServerUrl(serverBaseUrl); } catch(e){}
+      }
+      updateServerDisplay();
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+
+      if (name === 'upload') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('pane-upload').classList.add('active');
+      } else if (name === 'details') {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('pane-details').classList.add('active');
+      } else if (name === 'preview') {
+        document.querySelectorAll('.tab-btn')[2].classList.add('active');
+        document.getElementById('pane-preview').classList.add('active');
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function handleFileSelected(input, boxId, labelId) {
+      if (input.files && input.files.length > 0) {
+        document.getElementById(boxId).classList.add('has-file');
+        if (input.files.length === 1) {
+          document.getElementById(labelId).innerText = input.files[0].name.substring(0, 16) + '...';
+        } else {
+          document.getElementById(labelId).innerText = `✓ ${input.files.length} Photos Selected`;
+        }
+      }
+    }
+
+    /* Signature Handling & Touch Canvas */
+    function initSignatureCanvas() {
+      sigCanvas = document.getElementById('sig-canvas');
+      if (!sigCanvas) return;
+      sigCtx = sigCanvas.getContext('2d');
+      sigCtx.strokeStyle = '#1447a6';
+      sigCtx.lineWidth = 2.5;
+      sigCtx.lineCap = 'round';
+      sigCtx.lineJoin = 'round';
+
+      function getPos(e) {
+        const rect = sigCanvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const scaleX = sigCanvas.width / rect.width;
+        const scaleY = sigCanvas.height / rect.height;
+        return {
+          x: (clientX - rect.left) * scaleX,
+          y: (clientY - rect.top) * scaleY
+        };
+      }
+
+      function startDraw(e) {
+        isDrawing = true;
+        const p = getPos(e);
+        sigCtx.beginPath();
+        sigCtx.moveTo(p.x, p.y);
+        if (e.cancelable) e.preventDefault();
+      }
+
+      function moveDraw(e) {
+        if (!isDrawing) return;
+        const p = getPos(e);
+        sigCtx.lineTo(p.x, p.y);
+        sigCtx.stroke();
+        if (e.cancelable) e.preventDefault();
+      }
+
+      function endDraw(e) {
+        if (isDrawing) {
+          isDrawing = false;
+          sigCtx.closePath();
+        }
+      }
+
+      sigCanvas.addEventListener('mousedown', startDraw);
+      sigCanvas.addEventListener('mousemove', moveDraw);
+      sigCanvas.addEventListener('mouseup', endDraw);
+      sigCanvas.addEventListener('mouseleave', endDraw);
+
+      sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
+      sigCanvas.addEventListener('touchmove', moveDraw, { passive: false });
+      sigCanvas.addEventListener('touchend', endDraw, { passive: false });
+    }
+
+    function openSignaturePad(type) {
+      currentDrawingSigType = type;
+      document.getElementById('sig-pad-title').innerHTML =
+        '<i class="fa-solid fa-signature"></i> Draw ' + (type === 'borrower' ? 'Borrower' : 'Witness') + ' Signature';
+      document.getElementById('sig-pad-modal').classList.add('open');
+      if (!sigCtx) initSignatureCanvas();
+      clearSignatureCanvas();
+    }
+
+    function closeSignaturePad(e) {
+      document.getElementById('sig-pad-modal').classList.remove('open');
+    }
+
+    function clearSignatureCanvas() {
+      if (!sigCanvas || !sigCtx) return;
+      sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+    }
+
+    function saveSignatureCanvas() {
+      if (!sigCanvas) return;
+      const dataUrl = sigCanvas.toDataURL('image/png');
+      if (currentDrawingSigType === 'borrower') {
+        borrowerSignatureDataUrl = dataUrl;
+        const thumb = document.getElementById('thumb-sig-borrower');
+        if (thumb) {
+          thumb.src = dataUrl;
+          thumb.style.display = 'block';
+        }
+        document.getElementById('hint-sig-borrower').innerText = '✓ Screen Signature Saved';
+        document.getElementById('box-sig-borrower').classList.add('has-file');
+      } else {
+        witnessSignatureDataUrl = dataUrl;
+        const thumb = document.getElementById('thumb-sig-witness');
+        if (thumb) {
+          thumb.src = dataUrl;
+          thumb.style.display = 'block';
+        }
+        document.getElementById('hint-sig-witness').innerText = '✓ Screen Signature Saved';
+        document.getElementById('box-sig-witness').classList.add('has-file');
+      }
+      closeSignaturePad();
+    }
+
+    function handleSignatureFileSelected(input, type) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const dataUrl = e.target.result;
+          if (type === 'borrower') {
+            borrowerSignatureDataUrl = dataUrl;
+            const thumb = document.getElementById('thumb-sig-borrower');
+            if (thumb) {
+              thumb.src = dataUrl;
+              thumb.style.display = 'block';
+            }
+            document.getElementById('hint-sig-borrower').innerText = '✓ Photo: ' + file.name.substring(0, 12);
+            document.getElementById('box-sig-borrower').classList.add('has-file');
+          } else {
+            witnessSignatureDataUrl = dataUrl;
+            const thumb = document.getElementById('thumb-sig-witness');
+            if (thumb) {
+              thumb.src = dataUrl;
+              thumb.style.display = 'block';
+            }
+            document.getElementById('hint-sig-witness').innerText = '✓ Photo: ' + file.name.substring(0, 12);
+            document.getElementById('box-sig-witness').classList.add('has-file');
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    async function runDocumentExtraction() {
+      const btn = document.getElementById('btn-extract');
+      btn.innerHTML = '<span class="spinner"></span> Extracting Details from Documents...';
+      btn.disabled = true;
+
+      const formData = new FormData();
+      const inputs = ['file-aadhaar', 'file-pan', 'file-bank', 'file-loan'];
+      let added = 0;
+      for (const id of inputs) {
+        const inp = document.getElementById(id);
+        if (inp && inp.files) {
+          for (let i = 0; i < inp.files.length; i++) {
+            formData.append('files', inp.files[i]);
+            added++;
+          }
+        }
+      }
+
+      const nomInp = document.getElementById('file-nominee');
+      if (nomInp && nomInp.files) {
+        for (let i = 0; i < nomInp.files.length; i++) {
+          formData.append('file_nominee', nomInp.files[i]);
+          added++;
+        }
+      }
+
+      if (added === 0) {
+        alert('Please select or snap at least one document photo (Aadhaar, PAN, Passbook, Loan Sheet, or Nominee ID).');
+        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Extract All Customer Details';
+        btn.disabled = false;
+        return;
+      }
+
+      try {
+        const targetUrl = serverBaseUrl.replace(/\/+$/, '') + '/api/extract';
+        const res = await fetch(targetUrl, { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success && data.extracted_data) {
+          populateFormFields(data.extracted_data);
+          alert('Successfully extracted ' + Object.keys(data.extracted_data).length + ' fields!');
+          switchTab('details');
+        } else {
+          alert('Could not extract text. Please ensure images are legible.');
+        }
+      } catch (err) {
+        showConnectionErrorDialog(err.message);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Extract All Customer Details';
+        btn.disabled = false;
+      }
+    }
+
+    function showConnectionErrorDialog(errMsg) {
+      const is5g = !serverBaseUrl.includes('trycloudflare.com');
+      let msg = 'Could not reach server at:\n' + serverBaseUrl + '\n\n';
+      if (is5g) {
+        msg += 'Notice: Your phone is on 5G Mobile Data! Local Wi-Fi addresses (10.x.x.x) only work when your phone is connected to Wi-Fi.\n\n';
+        msg += 'Would you like to switch to 5G Cloud Mode now?';
+        if (confirm(msg)) {
+          selectPreset(CLOUD_TUNNEL_URL);
+          runDocumentExtraction();
+        }
+      } else {
+        msg += 'Please ensure start_app.bat is running on your computer.';
+        alert(msg);
+      }
+    }
+
+    function populateFormFields(d) {
+      for (const [key, val] of Object.entries(d)) {
+        if (key === 'annual_income') continue; // Always keep strictly 200000
+        const el = document.getElementById(key);
+        if (el && val !== undefined && val !== null) {
+          el.value = typeof val === 'string' ? val.toUpperCase() : val;
+        }
+      }
+      const incEl = document.getElementById('annual_income');
+      if (incEl) incEl.value = '200000';
+    }
+
+    function loadSample(num) {
+      if (num === 1) {
+        populateFormFields({
+          title: "Mr",
+          customer_name: "BHAGWAT DASHRATH KHATAL",
+          dob: "01/01/1992",
+          gender: "Male",
+          pan: "EENPK3248L",
+          marital_status: "Married",
+          annual_income: "200000",
+          address_line1: "AT BRAHMANGAON POST KAVI",
+          address_line2: "DIST PARBHANI",
+          city: "PARBHANI",
+          state: "MAHARASHTRA",
+          pincode: "431509",
+          mobile: "9807330912",
+          education: "10th pass",
+          occupation: "Agriculture",
+          loan_amount: "711221",
+          loan_term: "60",
+          premium_amount: "11221",
+          base_sum_assured: "711221",
+          bank_account_no: "80054420607",
+          bank_name_branch: "MAHARASHTRA GRAMIN BANK, JINTUR",
+          ifsc_code: "MAHG0004205",
+          nominee_name: "DASRATH PATHILBUVA KHATAL",
+          nominee_dob: "01/01/1970",
+          nominee_gender: "Male",
+          nominee_relation: "FATHER",
+          nominee_share: "100 %",
+          height: "173",
+          weight: "72",
+          date: "30/10/2026",
+          place: "parbhani",
+          witness_name: "Shubham Bhujbal"
+        });
+      } else if (num === 2) {
+        populateFormFields({
+          title: "Mr",
+          customer_name: "JITESH SHRIRANG JADHAV",
+          dob: "15/06/1992",
+          gender: "Male",
+          pan: "BEYPJ8359E",
+          marital_status: "Married",
+          annual_income: "200000",
+          address_line1: "RAIKHODA JOGWADA",
+          address_line2: "DIST PARBHANI",
+          city: "PARBHANI",
+          state: "MAHARASHTRA",
+          pincode: "431509",
+          mobile: "9890989309",
+          education: "12th pass",
+          occupation: "Agriculture",
+          loan_amount: "302888",
+          loan_term: "36",
+          premium_amount: "2888",
+          base_sum_assured: "302888",
+          bank_account_no: "38302782948",
+          bank_name_branch: "SBI, JINTUR",
+          ifsc_code: "SBIN0003423",
+          nominee_name: "RENUKA JITESH JADHAV",
+          nominee_dob: "01/01/1996",
+          nominee_gender: "Female",
+          nominee_relation: "WIFE",
+          nominee_share: "100 %",
+          height: "173",
+          weight: "71",
+          date: "15/10/2026",
+          place: "parbhani",
+          witness_name: "Swarup Gadhe"
+        });
+      }
+      switchTab('details');
+    }
+
+    async function generateFilledForm() {
+      const btn = document.getElementById('btn-generate');
+      btn.innerHTML = '<span class="spinner"></span> Generating Handwritten Application...';
+      btn.disabled = true;
+
+      const fieldIds = [
+        'title', 'customer_name', 'dob', 'gender', 'pan', 'marital_status',
+        'annual_income', 'address_line1', 'address_line2', 'city', 'state',
+        'pincode', 'mobile', 'education', 'occupation', 'loan_amount', 'loan_term',
+        'premium_amount', 'base_sum_assured', 'bank_account_no', 'bank_name_branch',
+        'ifsc_code', 'nominee_name', 'nominee_dob', 'nominee_gender', 'nominee_relation',
+        'nominee_share', 'height', 'weight', 'place', 'date', 'witness_name'
+      ];
+
+      const data = {};
+      for (const id of fieldIds) {
+        const el = document.getElementById(id);
+        if (el) data[id] = el.value.trim().toUpperCase();
+      }
+      data.base_coverage_term = data.loan_term;
+      if (borrowerSignatureDataUrl) {
+        data.borrower_signature = borrowerSignatureDataUrl;
+      }
+      if (witnessSignatureDataUrl) {
+        data.witness_signature = witnessSignatureDataUrl;
+      }
+
+      data.annual_income = '200000';
+
+      const formData = new FormData();
+      formData.append('data_str', JSON.stringify(data));
+
+      const loanFileInput = document.getElementById('file-loan');
+      if (loanFileInput && loanFileInput.files && loanFileInput.files[0]) {
+        formData.append('calc_file', loanFileInput.files[0]);
+      }
+
+      const custSigInput = document.getElementById('file-sig-borrower');
+      if (custSigInput && custSigInput.files && custSigInput.files[0]) {
+        formData.append('customer_sig_file', custSigInput.files[0]);
+      }
+
+      const witSigInput = document.getElementById('file-sig-witness');
+      if (witSigInput && witSigInput.files && witSigInput.files[0]) {
+        formData.append('witness_sig_file', witSigInput.files[0]);
+      }
+
+      try {
+        const targetUrl = serverBaseUrl.replace(/\/+$/, '') + '/api/generate';
+        const res = await fetch(targetUrl, { method: 'POST', body: formData });
+        const resData = await res.json();
+        if (resData.success) {
+          currentJobId = resData.job_id;
+          currentDownloadUrl = serverBaseUrl.replace(/\/+$/, '') + resData.download_url;
+          currentPreviewPages = resData.pages.map(p => serverBaseUrl.replace(/\/+$/, '') + p);
+
+          const chipsContainer = document.getElementById('page-chips');
+          chipsContainer.innerHTML = '';
+          currentPreviewPages.forEach((url, idx) => {
+            const b = document.createElement('button');
+            b.className = 'page-chip ' + (idx === 0 ? 'active' : '');
+            b.innerText = 'Page ' + (idx + 1);
+            b.onclick = () => showPreviewPage(idx);
+            chipsContainer.appendChild(b);
+          });
+
+          showPreviewPage(0);
+          switchTab('preview');
+        } else {
+          alert('Generation failed: ' + resData.detail);
+        }
+      } catch (err) {
+        showConnectionErrorDialog(err.message);
+      } finally {
+        btn.innerHTML = '<i class="fa-solid fa-feather-pointed"></i> Generate Handwritten Application Form';
+        btn.disabled = false;
+      }
+    }
+
+    function showPreviewPage(idx) {
+      activePageIndex = idx;
+      if (currentPreviewPages[idx]) {
+        document.getElementById('preview-img').src = currentPreviewPages[idx];
+        document.getElementById('preview-page-info').innerText = 'Page ' + (idx + 1) + ' of ' + currentPreviewPages.length;
+
+        const chips = document.querySelectorAll('.page-chip');
+        chips.forEach((c, i) => {
+          if (i === idx) c.classList.add('active');
+          else c.classList.remove('active');
+        });
+      }
+    }
+
+    function getBorrowerCaption() {
+      const el = document.getElementById('customer_name') || document.getElementById('borrower_name');
+      return (el && el.value ? el.value.trim().toUpperCase() : 'BORROWER');
+    }
+
+    function getBorrowerFilename() {
+      const caption = getBorrowerCaption();
+      const safe = caption.replace(/[^A-Za-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+      return `${safe || 'BORROWER'}.pdf`;
+    }
+
+    function triggerSharePdf() {
+      if (!currentDownloadUrl) {
+        alert('Please generate the form first.');
+        return;
+      }
+      const caption = getBorrowerCaption();
+      const safeFilename = getBorrowerFilename();
+
+      if (window.AndroidBridge && typeof window.AndroidBridge.sharePdf === 'function') {
+        window.AndroidBridge.sharePdf(currentDownloadUrl, safeFilename, caption);
+      } else {
+        const text = encodeURIComponent(caption);
+        window.open('https://api.whatsapp.com/send?text=' + text, '_blank');
+      }
+    }
+
+    function triggerDownloadPdf() {
+      if (!currentDownloadUrl) {
+        alert('Please generate the form first.');
+        return;
+      }
+      const safeFilename = getBorrowerFilename();
+
+      if (window.AndroidBridge && typeof window.AndroidBridge.downloadPdf === 'function') {
+        window.AndroidBridge.downloadPdf(currentDownloadUrl, safeFilename);
+      } else {
+        const a = document.createElement('a');
+        a.href = currentDownloadUrl;
+        a.download = safeFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      }
+    }
+
+    function triggerOpenPdf() {
+      if (!currentDownloadUrl) {
+        alert('Please generate the form first.');
+        return;
+      }
+      const safeFilename = getBorrowerFilename();
+
+      if (window.AndroidBridge && typeof window.AndroidBridge.openPdf === 'function') {
+        window.AndroidBridge.openPdf(currentDownloadUrl, safeFilename);
+      } else {
+        window.open(currentDownloadUrl, '_blank');
+      }
+    }
+
+    function openQrModal() {
+      document.getElementById('qr-modal').classList.add('open');
+    }
+    function closeQrModal(e) {
+      document.getElementById('qr-modal').classList.remove('open');
+    }
+
+    updateServerDisplay();
+  </script>
+</body>
+</html>

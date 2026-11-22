@@ -1,0 +1,21 @@
+{
+  "name": "Tata AIA Auto Form Filler",
+  "short_name": "Tata AIA Filler",
+  "description": "Auto Form Filler for Tata AIA Life Insurance",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#002663",
+  "theme_color": "#002663",
+  "icons": [
+    {
+      "src": "/static/icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/static/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

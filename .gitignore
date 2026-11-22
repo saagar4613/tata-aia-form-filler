@@ -1,0 +1,19 @@
+.gradle/
+build/
+app/build/
+android_app/app/build/
+outputs/*
+!outputs/.gitkeep
+*.iml
+.idea/caches/
+local.properties
+cloudflared.exe
+*.apk
+__pycache__/
+*.pyc
+*.png
+!static/icon.png
+Sample 1.pdf
+sample 2.pdf
+Sample 3.pdf
+filled_sample*.pdf
